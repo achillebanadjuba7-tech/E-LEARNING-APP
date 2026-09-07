@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>OpenEduVerse — Connexion</title>
+  <link rel="icon" href="{% static 'images/logo.png' %}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/auth_public.css' %}?v=1">
+</head>
+<body>
+  {% include 'react/_pub_nav.html' %}
+
+  <section class="pub-auth">
+    <div class="pub-auth-card">
+      <h1 class="pub-auth-title">Connexion</h1>
+      <p class="pub-auth-subtitle">
+        Entrez votre email et votre mot de passe. Un code de sécurité vous sera ensuite envoyé par email.
+      </p>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="pub-alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form action="{% url 'admin_login' %}" method="POST" class="pub-form" autocomplete="off">
+        {% csrf_token %}
+        <input type="email" name="email" placeholder="Email" class="pub-input" autocomplete="off" required autofocus />
+        <input type="password" name="password" placeholder="Mot de passe" class="pub-input" autocomplete="off" required />
+        <button type="submit" class="pub-submit">Continuer</button>
+      </form>
+
+      <div class="pub-auth-footer">
+        Pas encore de compte ? <a href="{% url 'register' %}">S'inscrire</a>
+      </div>
+    </div>
+  </section>
+
+  {% include 'react/_pub_footer.html' %}
+</body>
+</html>

@@ -30,10 +30,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('administrateur', 'Administrateur'),
     ]
 
+    SEXE_CHOICES = [
+        ('M', 'Homme'),
+        ('F', 'Femme'),
+    ]
+
     objects = UserManager()
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
     age = models.IntegerField(null=True, blank=True)  # ← null=True pour ne pas bloquer
+    sexe = models.CharField(max_length=1, choices=SEXE_CHOICES, blank=True)
+    date_naissance = models.DateField(null=True, blank=True)
+    telephone = models.CharField(max_length=20, blank=True)
     email = models.EmailField(max_length=300, unique=True)
     adresse = models.CharField(max_length=300, blank=True)
     role = models.CharField(max_length=100, choices=ROLE_CHOICES, default='etudiant')
@@ -579,6 +587,22 @@ class PaiementPayGate(models.Model):
 
     def __str__(self):
         return f"PayGate {self.identifier} - {self.montant} FCFA ({self.statut})"
+
+
+class ContactMessage(models.Model):
+    nom = models.CharField(max_length=150)
+    email = models.EmailField()
+    message = models.TextField()
+    date_creation = models.DateTimeField(auto_now_add=True)
+    traite = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-date_creation']
+        verbose_name = "Message de contact"
+        verbose_name_plural = "Messages de contact"
+
+    def __str__(self):
+        return f"{self.nom} <{self.email}> ({self.date_creation:%Y-%m-%d})"
 
 
 class LogActivite(models.Model):

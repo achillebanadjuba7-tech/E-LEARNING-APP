@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>OpenEduVerse — Inscription</title>
+  <link rel="icon" href="{% static 'images/logo.png' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/auth_public.css' %}?v=2">
+</head>
+<body>
+  {% include 'react/_pub_nav.html' %}
+
+  <section class="pub-auth">
+    <div class="pub-auth-card wide">
+      <a href="{% url 'index' %}" class="pub-back-link"><i class="fas fa-chevron-left"></i> Retour</a>
+
+      <h1 class="pub-auth-title">Créer un compte</h1>
+
+      <div class="pub-info-banner">
+        Remplissez les champs suivants avec vos informations personnelles, définissez un mot de passe et indiquez vos centres d'intérêt.
+      </div>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="pub-alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form action="{% url 'register' %}" method="POST" class="pub-form" autocomplete="off">
+        {% csrf_token %}
+
+        <div class="pub-role-toggle">
+          <label class="pub-role-option">
+            <input type="radio" name="role" value="etudiant" checked />
+            <span>Je suis étudiant</span>
+          </label>
+          <label class="pub-role-option">
+            <input type="radio" name="role" value="enseignant" />
+            <span>Je suis enseignant</span>
+          </label>
+        </div>
+
+        <div class="pub-field">
+          <label class="pub-field-label" for="id_nom">Nom<span class="req">*</span></label>
+          <input id="id_nom" type="text" name="nom" placeholder="Votre nom" class="pub-input" autocomplete="off" required />
+        </div>
+
+        <div class="pub-field">
+          <label class="pub-field-label" for="id_prenom">Prénom(s)<span class="req">*</span></label>
+          <input id="id_prenom" type="text" name="prenom" placeholder="Votre prénom(s)" class="pub-input" autocomplete="off" required />
+        </div>
+
+        <div class="pub-field">
+          <label class="pub-field-label" for="id_sexe">Sexe<span class="req">*</span></label>
+          <select id="id_sexe" name="sexe" class="pub-input" autocomplete="off" required>
+            <option value="" disabled selected>Sélectionnez votre sexe</option>
+            <option value="M">Homme</option>
+            <option value="F">Femme</option>
+          </select>
+        </div>
+
+        <div class="pub-field">
+          <label class="pub-field-label">Date de naissance<span class="req">*</span></label>
+          <div class="pub-date-triple">
+            <select name="naissance_jour" class="pub-input" autocomplete="off" required>
+              <option value="" disabled selected>Jour</option>
+              {% for j in jours %}<option value="{{ j }}">{{ j }}</option>{% endfor %}
+            </select>
+            <select name="naissance_mois" class="pub-input" autocomplete="off" required>
+              <option value="" disabled selected>Mois</option>
+              <option value="1">Janvier</option>
+              <option value="2">Février</option>
+              <option value="3">Mars</option>
+              <option value="4">Avril</option>
+              <option value="5">Mai</option>
+              <option value="6">Juin</option>
+              <option value="7">Juillet</option>
+              <option value="8">Août</option>
+              <option value="9">Septembre</option>
+              <option value="10">Octobre</option>
+              <option value="11">Novembre</option>
+              <option value="12">Décembre</option>
+            </select>
+            <select name="naissance_annee" class="pub-input" autocomplete="off" required>
+              <option value="" disabled selected>Année</option>
+              {% for y in annees %}<option value="{{ y }}">{{ y }}</option>{% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="pub-field">
+          <label class="pub-field-label" for="id_email">E-mail<span class="req">*</span></label>
+          <input id="id_email" type="email" name="email" placeholder="Votre Email" class="pub-input" autocomplete="off" required />
+        </div>
+
+        <div class="pub-field">
+          <label class="pub-field-label" for="id_telephone">Numéro de téléphone<span class="req">*</span></label>
+          <input id="id_telephone" type="tel" name="telephone" placeholder="Votre numéro de téléphone" class="pub-input" autocomplete="off" required />
+        </div>
+
+        <div class="pub-field">
+          <label class="pub-field-label">Centres d'intérêt</label>
+          <div class="pub-multi-select" id="ooMatiereMultiSelect">
+            <button type="button" class="pub-multi-trigger" id="ooMatiereTrigger" aria-haspopup="listbox" aria-expanded="false">
+              <span>Qu'est-ce qui vous intéresse ?</span>
+              <span class="pub-multi-caret" aria-hidden="true">▾</span>
+            </button>
+            <div class="pub-multi-panel" role="listbox" aria-label="Choix des centres d'intérêt">
+              {% for course in cours_disponibles %}
+                <label class="pub-multi-item">
+                  <input type="checkbox" name="courses" value="{{ course.id }}" />
+                  <span>{{ course.titre }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div class="pub-field">
+          <label class="pub-field-label" for="id_password1">Mot de passe<span class="req">*</span></label>
+          <div class="pub-password-field">
+            <i class="fas fa-lock pub-lock-icon"></i>
+            <input id="id_password1" type="password" name="password1" placeholder="Mot de passe" class="pub-input" autocomplete="new-password" required />
+            <button type="button" class="pub-toggle-eye" data-target="id_password1" aria-label="Afficher le mot de passe">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="pub-field">
+          <label class="pub-field-label" for="id_password2">Confirmation du mot de passe<span class="req">*</span></label>
+          <div class="pub-password-field">
+            <i class="fas fa-lock pub-lock-icon"></i>
+            <input id="id_password2" type="password" name="password2" placeholder="Confirmation du mot de passe" class="pub-input" autocomplete="new-password" required />
+            <button type="button" class="pub-toggle-eye" data-target="id_password2" aria-label="Afficher le mot de passe">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <p class="pub-field-hint">Saisir le même mot de passe</p>
+        </div>
+
+        <button type="submit" class="pub-submit">Créer mon compte</button>
+      </form>
+
+      <div class="pub-auth-footer">
+        Vous avez déjà un compte ? <a href="{% url 'admin_login' %}">Se connecter</a>
+      </div>
+    </div>
+  </section>
+
+  {% include 'react/_pub_footer.html' %}
+
+  <script>
+    (function () {
+      var trigger = document.getElementById('ooMatiereTrigger');
+      var container = document.getElementById('ooMatiereMultiSelect');
+      if (trigger && container) {
+        trigger.addEventListener('click', function (e) {
+          e.preventDefault();
+          var isOpen = container.classList.toggle('open');
+          trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+        document.addEventListener('click', function (e) {
+          if (!container.contains(e.target)) {
+            container.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+
+      document.querySelectorAll('.pub-toggle-eye').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var input = document.getElementById(btn.getAttribute('data-target'));
+          var icon = btn.querySelector('i');
+          if (!input) return;
+          var showing = input.type === 'text';
+          input.type = showing ? 'password' : 'text';
+          icon.classList.toggle('fa-eye', showing);
+          icon.classList.toggle('fa-eye-slash', !showing);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>OpenEduVerse — Vérification du code</title>
+  <link rel="icon" href="{% static 'images/logo.png' %}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/auth_public.css' %}?v=1">
+</head>
+<body>
+  {% include 'react/_pub_nav.html' %}
+
+  <section class="pub-auth">
+    <div class="pub-auth-card">
+      <h1 class="pub-auth-title">Vérification</h1>
+      <p class="pub-auth-subtitle">
+        Un code à 6 chiffres a été envoyé à <strong>{{ email }}</strong>. Il est valable 10 minutes.
+      </p>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="pub-alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      {% if otp_dev %}
+        <div class="pub-alert pub-alert-dev">
+          Mode développement (aucun serveur email configuré) — votre code est : <strong>{{ otp_dev }}</strong>
+        </div>
+      {% endif %}
+
+      <form action="{% url 'verifier_code' %}" method="POST" class="pub-form" autocomplete="off">
+        {% csrf_token %}
+        <input
+          type="text"
+          name="code"
+          placeholder="000000"
+          class="pub-input pub-otp-input"
+          inputmode="numeric"
+          pattern="[0-9]{6}"
+          maxlength="6"
+          autocomplete="off"
+          required
+          autofocus
+        />
+        <button type="submit" class="pub-submit">Vérifier</button>
+      </form>
+
+      <form action="{% url 'verifier_code' %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" name="renvoyer" value="1" class="pub-resend">Je n'ai pas reçu de code — renvoyer</button>
+      </form>
+
+      <div class="pub-auth-footer">
+        <a href="{% url 'admin_login' %}">Utiliser un autre email</a>
+      </div>
+    </div>
+  </section>
+
+  {% include 'react/_pub_footer.html' %}
+</body>
+</html>

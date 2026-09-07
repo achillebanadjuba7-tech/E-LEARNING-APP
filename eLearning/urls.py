@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from . import api_public
+from . import auth_otp
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -7,11 +9,18 @@ urlpatterns = [
     path('apropos/', views.apropos, name='a_propos'),
     path('contact/', views.contact, name='contact'),
     path('register/', views.admin_register, name='register'),
-    
+
+    # API JSON pour les 4 pages publiques React (accueil, cours, à propos, contact)
+    path('api/public/session/', api_public.public_session, name='api_public_session'),
+    path('api/public/courses/', api_public.public_courses, name='api_public_courses'),
+    path('api/public/contact/', api_public.public_contact, name='api_public_contact'),
+
     # Dashboards
     path('dashboard/', views.dashboard, name='dashboard'),
 
-    path('dashboard/admin/login/', views.admin_login, name='admin_login'),
+    # Connexion sans mot de passe : email -> code reçu par email -> connexion
+    path('dashboard/admin/login/', auth_otp.demander_code, name='admin_login'),
+    path('dashboard/admin/login/code/', auth_otp.verifier_code, name='verifier_code'),
     path('dashboard/admin/logout/', views.admin_logout, name='admin_logout'),
     path('dashboard/etudiant/', views.dashboard_etudiant_view, name='dashboard_etudiant'),
     path('dashboard/etudiant/mes-courses/', views.mes_courses, name='mes_courses'),

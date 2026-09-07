@@ -79,7 +79,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'elearning',
         'USER': 'postgres',
-        'PASSWORD': '3432',
+        'PASSWORD': '15255',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -175,4 +175,21 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 if SITE_BASE_URL.startswith('http'):
     CSRF_TRUSTED_ORIGINS.append(SITE_BASE_URL)
+
+# === Email (codes de connexion OTP) ===
+# Si EMAIL_HOST_USER/EMAIL_HOST_PASSWORD sont renseignés dans .env, on envoie
+# de vrais emails via SMTP. Sinon on retombe sur le backend "console" : les
+# emails (donc les codes OTP) sont simplement affichés dans les logs du
+# serveur de dev, sans configuration requise.
+EMAIL_HOST = _load_env_var('EMAIL_HOST') or 'smtp.gmail.com'
+EMAIL_PORT = int(_load_env_var('EMAIL_PORT') or 587)
+EMAIL_HOST_USER = _load_env_var('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = _load_env_var('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = _load_env_var('DEFAULT_FROM_EMAIL') or 'OpenEduVerse <no-reply@openeduverse.com>'
+
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

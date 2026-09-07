@@ -1,0 +1,155 @@
+.hero {
+  padding: 76px 0 90px;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroPhoto {
+    display: none;
+  }
+}
+
+.title {
+  font-size: 3rem;
+  line-height: 1.1;
+  margin: 0 0 22px;
+  max-width: 620px;
+}
+
+.accent {
+  position: relative;
+  color: var(--oo-accent-deep);
+}
+
+.accent svg {
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 100%;
+  height: 12px;
+}
+
+.lead {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--oo-text-muted);
+  max-width: 480px;
+  margin: 0 0 34px;
+}
+
+.ctaRow {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.heroPhoto .frame {
+  border-radius: var(--oo-radius-lg);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  box-shadow: var(--oo-shadow-lift);
+}
+
+.heroPhoto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.section {
+  padding: 76px 0;
+}
+
+.about {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 56px;
+  align-items: center;
+}
+
+@media (max-width: 860px) {
+  .about {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 2.2rem;
+  }
+}
+
+.aboutPhoto img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  border-radius: var(--oo-radius-lg);
+  box-shadow: var(--oo-shadow);
+}
+
+.aboutText h2 {
+  font-size: 2rem;
+  color: var(--oo-ink);
+  margin: 0 0 18px;
+}
+
+.aboutText p {
+  color: var(--oo-text-muted);
+  line-height: 1.75;
+  margin: 0 0 26px;
+  font-size: 1.05rem;
+  max-width: 520px;
+}
+
+.ctaSection {
+  background: var(--oo-surface);
+  border-top: 1px solid var(--oo-border);
+  border-bottom: 1px solid var(--oo-border);
+}
+
+.ctaGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (max-width: 860px) {
+  .ctaGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ctaGrid h3 {
+  color: var(--oo-ink);
+  font-size: 1.8rem;
+  margin: 0 0 16px;
+}
+
+.ctaGrid p {
+  color: var(--oo-text-muted);
+  line-height: 1.7;
+  margin: 0 0 24px;
+  font-size: 1.05rem;
+  max-width: 460px;
+}
+
+.ctaImg {
+  overflow: hidden;
+  border-radius: var(--oo-radius-lg);
+  box-shadow: var(--oo-shadow);
+}
+
+.ctaImg img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+}

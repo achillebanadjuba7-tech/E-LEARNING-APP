@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Etudiant, Administrateur, Enseignant, Inscription, Cours, Quiz, Paiement, Chapitre, ChapitreDebloque, TransactionSimulee, Module, RessourceChapitre
+from .models import User, Etudiant, Administrateur, Enseignant, Inscription, Cours, Quiz, Paiement, Chapitre, ChapitreDebloque, TransactionSimulee, Module, RessourceChapitre, ContactMessage
 
 
 class CustomUserAdmin(UserAdmin):
@@ -157,5 +157,13 @@ class ChapitreDebloqueAdmin(admin.ModelAdmin):
 class TransactionSimuleeAdmin(admin.ModelAdmin):
     list_display = ['etudiant', 'type_transaction', 'montant', 'date_transaction']
     list_filter = ['type_transaction', 'date_transaction']
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ['nom', 'email', 'date_creation', 'traite']
+    list_filter = ['traite', 'date_creation']
+    search_fields = ['nom', 'email', 'message']
+    readonly_fields = ['date_creation']
+
 
 admin.site.register(User, CustomUserAdmin)

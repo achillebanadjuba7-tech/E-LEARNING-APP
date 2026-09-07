@@ -8,3 +8,5 @@ media/
 .idea/
 .vscode/
 *.log
+.tools/
+frontend/node_modules/

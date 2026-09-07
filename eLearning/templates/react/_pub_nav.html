@@ -1,0 +1,24 @@
+{% load static %}
+<header class="pub-header">
+  <div class="pub-bar">
+    <a class="pub-brand" href="{% url 'index' %}">
+      <img src="{% static 'images/logo.png' %}" alt="Logo OpenEduVerse" />
+      <span><span class="open">Open</span><span class="eduverse">Eduverse</span></span>
+    </a>
+    <nav class="pub-links">
+      <a href="{% url 'index' %}">Accueil</a>
+      <a href="{% url 'course' %}">Cours</a>
+      <a href="{% url 'a_propos' %}">À propos</a>
+      <a href="{% url 'contact' %}">Contact</a>
+    </nav>
+    <div class="pub-actions">
+      {% if user.is_authenticated %}
+        <a href="{% url 'admin_logout' %}" class="pub-btn pub-btn-outline">Déconnexion</a>
+        <a href="{% url 'dashboard' %}" class="pub-btn pub-btn-solid">Tableau de bord</a>
+      {% else %}
+        <a href="{% url 'register' %}" class="pub-btn pub-btn-outline {% if request.resolver_match.url_name == 'register' %}active{% endif %}">Créer un compte</a>
+        <a href="{% url 'admin_login' %}" class="pub-btn pub-btn-solid">Se connecter</a>
+      {% endif %}
+    </div>
+  </div>
+</header>

@@ -1,5 +1,5 @@
 
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from django.db.models import F, Min, Prefetch
 
 from django.contrib import messages
@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.urls import reverse
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 import os
 import requests
 
@@ -53,81 +54,70 @@ def _gemini_generer_json(prompt, model='gemini-flash-latest', timeout=60):
     return data["candidates"][0]["content"]["parts"][0]["text"].strip()
 
 
-# Vues de base
+# Vues de base — 4 pages publiques reconstruites en React (voir eLearning/api_public.py
+# pour les données JSON qu'elles consomment). Ces vues ne font plus que servir la
+# coquille HTML minimale ; @ensure_csrf_cookie garantit que le cookie CSRF est
+# disponible dès le premier chargement pour les formulaires/fetch React.
+from django.views.decorators.csrf import ensure_csrf_cookie
+
 def index(request):
-    return render(request, 'index.html')
+    return render(request, 'react/home.html')
 
-from django.core.paginator import Paginator
-
+@ensure_csrf_cookie
 def course(request):
-    cours_list = Cours.objects.select_related('categorie', 'enseignant').order_by('-date_publication', '-id')
-    
-    # Pagination: 6 courses per page
-    paginator = Paginator(cours_list, 6)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    inscriptions_existantes = set()
+    return render(request, 'react/courses.html')
 
-    if request.user.is_authenticated and request.user.is_etudiant:
-        inscriptions_existantes = set(
-            Inscription.objects.filter(etudiant=request.user.etudiant).values_list('cours_id', flat=True)
-        )
-
-    context = {
-        'cours_list': page_obj,
-        'inscriptions_existantes': inscriptions_existantes,
-    }
-    return render(request, 'course.html', context)
-
+@ensure_csrf_cookie
 def contact(request):
-    return render(request, 'contact.html')
+    return render(request, 'react/contact.html')
 
 def apropos(request):
-    return render(request, 'a_propos.html')
+    return render(request, 'react/about.html')
 
 
-def admin_login(request):
-    if request.user.is_authenticated:
-        return get_dashboard_redirect(request.user)
-        
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        user = authenticate(request, email=email, password=password)
-        if user is not None:
-            login(request, user)
-            _log(request, user, "Connexion réussie")
-            return get_dashboard_redirect(user)
-        else:
-            messages.error(request, 'Identifiants invalides')
-    return render(request, 'login.html')
 
 def admin_logout(request):
     logout(request)
     return redirect('index')
 
+def _register_context():
+    annee_courante = timezone.now().year
+    return {
+        'cours_disponibles': Cours.objects.all(),
+        'jours': range(1, 32),
+        'annees': range(annee_courante - 5, annee_courante - 100, -1),
+    }
+
+
 def admin_register(request):
-    cours_disponibles = Cours.objects.all()
     if request.method == 'POST':
         nom = request.POST.get('nom')
         prenom = request.POST.get('prenom')
         email = request.POST.get('email')
         age = request.POST.get('age')
+        sexe = request.POST.get('sexe') or ''
+        telephone = request.POST.get('telephone') or ''
         role = request.POST.get('role')
-        adresse = request.POST.get('adresse')
+        adresse = request.POST.get('adresse') or ''
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
         selected_courses = request.POST.getlist('courses')
 
+        jour = request.POST.get('naissance_jour')
+        mois = request.POST.get('naissance_mois')
+        annee = request.POST.get('naissance_annee')
+        date_naissance = None
+        if jour and mois and annee:
+            date_naissance = f"{int(annee):04d}-{int(mois):02d}-{int(jour):02d}"
+
         # Validation basique
         if password1 != password2:
             messages.error(request, "Les mots de passe ne correspondent pas.")
-            return render(request, 'register.html', {'cours_disponibles': cours_disponibles})
+            return render(request, 'react/register.html', _register_context())
 
         if User.objects.filter(email=email).exists():
             messages.error(request, "Cet email existe déjà.")
-            return render(request, 'register.html', {'cours_disponibles': cours_disponibles})
+            return render(request, 'react/register.html', _register_context())
 
         try:
             if role == 'etudiant':
@@ -137,6 +127,9 @@ def admin_register(request):
                     nom=nom,
                     prenom=prenom,
                     age=age,
+                    sexe=sexe,
+                    date_naissance=date_naissance,
+                    telephone=telephone,
                     adresse=adresse,
                     role = role
                 )
@@ -154,20 +147,22 @@ def admin_register(request):
                     nom=nom,
                     prenom=prenom,
                     age=age,
+                    sexe=sexe,
+                    date_naissance=date_naissance,
+                    telephone=telephone,
                     adresse=adresse,
                     role = role
                 )
-            
-            login(request, user)
+
             _log(request, user, f"Inscription en tant que {role}")
-            messages.success(request, "Inscription réussie !")
-            return get_dashboard_redirect(user)
+            messages.success(request, "Inscription réussie ! Connectez-vous avec votre email et votre mot de passe.")
+            return redirect('admin_login')
 
         except Exception as e:
             messages.error(request, f"Une erreur est survenue lors de l'inscription : {e}")
-            return render(request, 'register.html', {'cours_disponibles': cours_disponibles})
+            return render(request, 'react/register.html', _register_context())
 
-    return render(request, 'register.html', {'cours_disponibles': cours_disponibles})
+    return render(request, 'react/register.html', _register_context())
 
 @login_required
 def dashboard(request):
